@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -14,6 +15,11 @@ namespace usersManagmentApplication.Server.Services
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly HttpClient client;
+		private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+		{
+			PropertyNameCaseInsensitive = true
+		};
+
 		public ReqresQueryService(IHttpClientFactory httpClientFactory)
 		{
 			_httpClientFactory = httpClientFactory;
@@ -40,15 +46,15 @@ namespace usersManagmentApplication.Server.Services
 			throw new NotImplementedException();
 		}
 
-		public async Task<ReqresResponse> GetUser(int id)
+		public async Task<ReqresUser?> GetUser(int id)
 		{
 			HttpResponseMessage response = await client.GetAsync($"{client.BaseAddress}users/{id}");
 
 			if (response.IsSuccessStatusCode)
 			{
 				string responseBody = await response.Content.ReadAsStringAsync();
-				ReqresResponse userResponse = JsonDocument.Parse(responseBody).RootElement.GetProperty("data").Deserialize<ReqresResponse>();
-				return userResponse;
+				ReqresResponse userResponse = JsonSerializer.Deserialize<ReqresResponse>(responseBody, jsonOptions)!;
+				return userResponse?.Data;
 			}
 			else if (response.StatusCode == HttpStatusCode.NotFound)
 			{
