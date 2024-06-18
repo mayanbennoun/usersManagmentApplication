@@ -41,9 +41,11 @@ namespace usersManagmentApplication.Server.Services
 			return response.IsSuccessStatusCode;
 		}
 
-		public Task DeleteUser(int id)
+		public async Task<bool> DeleteUser(int id)
 		{
-			throw new NotImplementedException();
+			 HttpResponseMessage response = await client.DeleteAsync($"{client.BaseAddress}users/{id}");
+			return response.IsSuccessStatusCode;
+
 		}
 
 		public async Task<ReqresUser?> GetUser(int id)
@@ -53,7 +55,7 @@ namespace usersManagmentApplication.Server.Services
 			if (response.IsSuccessStatusCode)
 			{
 				string responseBody = await response.Content.ReadAsStringAsync();
-				ReqresResponse userResponse = JsonSerializer.Deserialize<ReqresResponse>(responseBody, jsonOptions)!;
+				ReqresSingleUserResponse userResponse = JsonSerializer.Deserialize<ReqresSingleUserResponse>(responseBody, jsonOptions)!;
 				return userResponse?.Data;
 			}
 			else if (response.StatusCode == HttpStatusCode.NotFound)
@@ -84,9 +86,12 @@ namespace usersManagmentApplication.Server.Services
 		}
 
 
-		public Task UpdateUser(int id)
+		public Task<bool> UpdateUser(int id, string name,string job)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult(true)  ;
+			//HttpContent httpContent =new HttpContent().;
+			//HttpResponseMessage response = await client.PutAsync($"{client.BaseAddress}users/{id}",);
+
 		}
 	}
 }

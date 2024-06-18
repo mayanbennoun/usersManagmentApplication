@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using usersManagmentApplication.Server.Dto;
 using usersManagmentApplication.Server.Interfaces;
 
@@ -36,14 +37,14 @@ namespace usersManagmentApplication.Server.Controllers
 
 				if (user == null)
 				{
-					return NotFound(new { Error = "User not found" });
+					return NotFound(new {}); 
 				}
 
 				return Ok(user);
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, new { Error = ex.Message });
+				return BadRequest(ex.Message);
 			}
 		}
 
@@ -72,14 +73,30 @@ namespace usersManagmentApplication.Server.Controllers
 
 		// PUT api/<UsersController>/5
 		[HttpPut("/updateUser/{id}")]
-		public void Put(int id, [FromBody] string value)
+		public async Task<IActionResult>Put(int id, [FromBody] string name , string job)
 		{
+			if (await queryService.UpdateUser(id ,name,job))
+			{
+				return NoContent();
+			}
+			else
+			{
+				return NotFound();
+			}
 		}
 
 		// DELETE api/<UsersController>/5
 		[HttpDelete("/deleteUser/{id}")]
-		public void Delete(int id)
+		public async Task<IActionResult> Delete(int id)
 		{
+			if( await queryService.DeleteUser(id))
+			{
+				return NoContent();
+			}
+			else
+			{
+				return NotFound();
+			}
 		}
 	}
 }
