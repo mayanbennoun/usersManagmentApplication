@@ -2,22 +2,23 @@ import { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
-import UserCard from './userCard';
+import TextField from '@mui/material/TextField';
+import UserCard from './userCard'; // Import UserCard component
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(4); // State for items per page
     const [responseMessage, setResponseMessage] = useState('');
-    const usersPerPage = 4; // Number of users per page
 
     useEffect(() => {
-        fetchUsers(page);
-    }, [page]);
+        fetchUsers(page, itemsPerPage);
+    }, [page, itemsPerPage]);
 
-    const fetchUsers = async (page) => {
+    const fetchUsers = async (page, itemsPerPage) => {
         try {
-            const response = await fetch(`https://localhost:7002/getUsers/${page}?per_page=${usersPerPage}`, {
+            const response = await fetch(`https://localhost:7002/getUsers/${page}?perPage=${itemsPerPage}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -41,9 +42,14 @@ const UserList = () => {
         setPage(value);
     };
 
+    const handleItemsPerPageChange = (event) => {
+        setItemsPerPage(Number(event.target.value));
+        setPage(1); // Reset to the first page whenever items per page is changed
+    };
+
     const handleUserDeleted = (message) => {
         setResponseMessage(message);
-        fetchUsers(page); // Refetch users after deletion
+        fetchUsers(page, itemsPerPage); // Refetch users after deletion
     };
 
     return (
@@ -67,6 +73,16 @@ const UserList = () => {
                 ))}
             </Grid>
             <Grid container justifyContent="center" padding="1rem">
+                <TextField
+                    label="Items per page"
+                    type="number"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                    inputProps={{ min: 1 }}
+                    variant="outlined"
+                    size="small"
+                    sx={{ marginBottom: '1rem' }}
+                />
                 <Pagination count={totalPages} page={page} onChange={handlePageChange} />
             </Grid>
         </>
