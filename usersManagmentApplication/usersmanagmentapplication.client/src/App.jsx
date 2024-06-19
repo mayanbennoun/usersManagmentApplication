@@ -1,18 +1,17 @@
-//import { useEffect, useState } from 'react';
 import './App.css';
-import UserCard from './components/usersCards';
 import CreateUserDialog from './components/createUserForm';
-//import UserDialog from './components/newUserForm';
 import UpdateUserForm from './components/UpdateUser';
+import UserList from './components/UserList';
 
 function App() {
     return (
         <>
-            <UserCard/>
-            <CreateUserDialog />
-            <UpdateUserForm/>
+            <UserList />
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem', gap: '2rem' }}>
+                <CreateUserDialog />
+                <UpdateUserForm />
+            </div>
         </>
-
     );
     
 }

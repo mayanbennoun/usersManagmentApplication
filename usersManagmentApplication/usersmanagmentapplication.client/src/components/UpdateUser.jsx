@@ -6,13 +6,14 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const defaultTheme = createTheme();
 
@@ -73,7 +74,7 @@ export default function UpdateUserForm() {
                             }}
                         >
                             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                                <PersonAddIcon />
+                                <ManageAccountsIcon />
                             </Avatar>
                             <Typography component="h1" variant="h5">
                                 Create User
@@ -119,7 +120,7 @@ export default function UpdateUserForm() {
                                     fullWidth
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
-                                    endIcon={<PersonAddIcon />}
+                                    endIcon={<AutoFixHighIcon />}
                                 >
                                     Update
                                 </Button>
