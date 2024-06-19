@@ -81,7 +81,7 @@ const UserCard = ({ user, onDelete, onCardClick }) => {
                 <ExpandMore
                     expand={expanded}
                     onClick={(e) => {
-                        e.stopPropagation(); // Prevent the click event from propagating to the card
+                        e.stopPropagation();
                         handleExpandClick();
                     }}
                     aria-expanded={expanded}
@@ -94,7 +94,7 @@ const UserCard = ({ user, onDelete, onCardClick }) => {
                 <CardContent>
                     <Typography paragraph>{user.email}</Typography>
                     <Button size="small" onClick={(e) => {
-                        e.stopPropagation(); // Prevent the click event from propagating to the card
+                        e.stopPropagation();
                         handleExpandClick();
                     }}>
                         Close

@@ -1,18 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using usersManagmentApplication.Server.Dto;
 using usersManagmentApplication.Server.Interfaces;
 using usersManagmentApplication.Server.ReqresResponses;
 
 namespace usersManagmentApplication.Server.Services
 {
-    public class ReqresQueryService : IQueryService
+	public class ReqresQueryService : IQueryService
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly HttpClient client;
@@ -21,15 +16,16 @@ namespace usersManagmentApplication.Server.Services
 			PropertyNameCaseInsensitive = true
 		};
 
-		private List<ReqresUser> reqresUsers; 
+		private List<ReqresUser?> reqresUsers; 
 		public ReqresQueryService(IHttpClientFactory httpClientFactory)
 		{
 			_httpClientFactory = httpClientFactory;
 			client = _httpClientFactory.CreateClient("reqresapi");
-			reqresUsers = GetUsers(1, 12).Result.Data;
+			ReqresResponse? result = GetUsers(1, 12).Result;
+			reqresUsers = result.Data;
 
 		}
-		public async Task<CreateUserResponse> CreateUser(string fullName, string job)
+		public async Task<CreateUserResponse?> CreateUser(string fullName, string job)
 		{
 			var user = new 
 			{
@@ -79,7 +75,7 @@ namespace usersManagmentApplication.Server.Services
 			}
 		}
 
-		public async Task<ReqresResponse> GetUsers(int page ,int perPage)
+		public async Task<ReqresResponse?> GetUsers(int page ,int perPage)
 		{
 			string url = $"{client.BaseAddress}users?page={page}&per_page={perPage}";
 			HttpResponseMessage response = await client.GetAsync(url);
@@ -87,7 +83,7 @@ namespace usersManagmentApplication.Server.Services
 			if (response.IsSuccessStatusCode)
 			{
 				string responseBody = await response.Content.ReadAsStringAsync();
-				ReqresResponse users = JsonSerializer.Deserialize<ReqresResponse>(responseBody);
+				ReqresResponse? users = JsonSerializer.Deserialize<ReqresResponse?>(responseBody);
                 return users;
 			}
 			else
@@ -97,7 +93,7 @@ namespace usersManagmentApplication.Server.Services
 		}
 
 
-		public async Task<UpdateUserResponse> UpdateUser(int id, string name,string job)
+		public async Task<UpdateUserResponse?> UpdateUser(int id, string name,string job)
 		{
 			if (reqresUsers.FirstOrDefault(user => user.Id == id) == null)
 			{

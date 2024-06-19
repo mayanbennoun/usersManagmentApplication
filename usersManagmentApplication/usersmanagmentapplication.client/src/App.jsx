@@ -12,8 +12,6 @@ function App() {
                 <UpdateUserForm />
             </div>
         </>
-    );
-    
+    );   
 }
-
 export default App;

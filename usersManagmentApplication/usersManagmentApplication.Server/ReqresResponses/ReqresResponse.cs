@@ -1,10 +1,9 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using usersManagmentApplication.Server.Dto;
 
 namespace usersManagmentApplication.Server.ReqresResponses
 {
-    public class ReqresResponse
+	public class ReqresResponse
     {
         [JsonPropertyName("page")]
         public int Page { get; set; }
