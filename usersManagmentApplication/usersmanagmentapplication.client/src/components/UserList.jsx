@@ -9,7 +9,7 @@ const UserList = () => {
     const [users, setUsers] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(4); // State for items per page
+    const [itemsPerPage, setItemsPerPage] = useState(6); // State for items per page
     const [responseMessage, setResponseMessage] = useState('');
 
     useEffect(() => {
