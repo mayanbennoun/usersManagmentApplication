@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -10,10 +11,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
-import PropTypes from 'prop-types'; 
 
 const ExpandMore = styled((props) => {
-    // eslint-disable-next-line no-unused-vars
     const { expand, ...other } = props;
     return <IconButton {...other} />;
 })(({ theme, expand }) => ({
@@ -24,7 +23,7 @@ const ExpandMore = styled((props) => {
     }),
 }));
 
-const UserCard = ({ user, onDelete }) => {
+const UserCard = ({ user, onDelete, onCardClick }) => {
     const [expanded, setExpanded] = useState(false);
 
     const handleExpandClick = () => {
@@ -52,7 +51,10 @@ const UserCard = ({ user, onDelete }) => {
     };
 
     return (
-        <Card sx={{ maxWidth: '15rem', height: 'auto', margin: '0.5rem' }}>
+        <Card
+            sx={{ maxWidth: '15rem', height: 'auto', margin: '0.5rem' }}
+            onClick={() => onCardClick(user.id)} 
+        >
             <CardMedia
                 component="img"
                 alt={`${user.first_name} ${user.last_name}`}
@@ -67,7 +69,10 @@ const UserCard = ({ user, onDelete }) => {
             <CardActions disableSpacing>
                 <Button
                     size="small"
-                    onClick={handleDelete}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                    }}
                     startIcon={<DeleteIcon />}
                     sx={{ color: 'red' }}
                 >
@@ -75,7 +80,10 @@ const UserCard = ({ user, onDelete }) => {
                 </Button>
                 <ExpandMore
                     expand={expanded}
-                    onClick={handleExpandClick}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent the click event from propagating to the card
+                        handleExpandClick();
+                    }}
                     aria-expanded={expanded}
                     aria-label="show more"
                 >
@@ -85,7 +93,10 @@ const UserCard = ({ user, onDelete }) => {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <Typography paragraph>{user.email}</Typography>
-                    <Button size="small" onClick={handleExpandClick}>
+                    <Button size="small" onClick={(e) => {
+                        e.stopPropagation(); // Prevent the click event from propagating to the card
+                        handleExpandClick();
+                    }}>
                         Close
                     </Button>
                 </CardContent>
@@ -103,6 +114,7 @@ UserCard.propTypes = {
         avatar: PropTypes.string.isRequired,
     }).isRequired,
     onDelete: PropTypes.func.isRequired,
+    onCardClick: PropTypes.func.isRequired, 
 };
 
 export default UserCard;
