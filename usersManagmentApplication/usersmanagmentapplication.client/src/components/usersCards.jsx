@@ -41,9 +41,10 @@ const ExpandMore = styled((props) => {
 
 const UserCard = () => {
     const [expanded, setExpanded] = useState({});
-    const [reqresUsers, setReqresUsers] = useState();
-    useEffect(() => {
-        getUsersData();
+    const [reqresUsers, setReqresUsers] = useState([]);
+    useEffect( () => {
+         getUsersData();
+        console.log(reqresUsers)
     }, []);
 
     const handleExpandClick = (userId) => {
@@ -106,14 +107,31 @@ const UserCard = () => {
                 ))}
             </Grid>
         </>
-
     );
 
     async function getUsersData() {
-        const response = await fetch('usersManagmentApplication');
-        console.log(response);
-        const data = await response.json();
-        setReqresUsers(data);
+        try {
+            const page = 1;
+            const response = await fetch(`https://localhost:7002/getUsers/${page}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("data ", data);
+            setReqresUsers(data.data); // Use the 'data' field from your response
+        }
+        catch (error) {
+        console.error('Fetch error:', error);
+        }
+  
     }
 };
 

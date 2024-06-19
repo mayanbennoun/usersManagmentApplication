@@ -8,10 +8,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using usersManagmentApplication.Server.Dto;
 using usersManagmentApplication.Server.Interfaces;
+using usersManagmentApplication.Server.ReqresResponses;
 
 namespace usersManagmentApplication.Server.Services
 {
-	public class ReqresQueryService : IQueryService
+    public class ReqresQueryService : IQueryService
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly HttpClient client;
@@ -20,13 +21,15 @@ namespace usersManagmentApplication.Server.Services
 			PropertyNameCaseInsensitive = true
 		};
 
+		private List<ReqresUser> reqresUsers; 
 		public ReqresQueryService(IHttpClientFactory httpClientFactory)
 		{
 			_httpClientFactory = httpClientFactory;
 			client = _httpClientFactory.CreateClient("reqresapi");
+			reqresUsers = GetUsers(1, 12).Result.Data;
 
 		}
-		public async Task<bool> CreateUser(string fullName, string job)
+		public async Task<CreateUserResponse> CreateUser(string fullName, string job)
 		{
 			var user = new 
 			{
@@ -37,8 +40,16 @@ namespace usersManagmentApplication.Server.Services
 			var content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
 
 			var response = await client.PostAsync("users", content);
-
-			return response.IsSuccessStatusCode;
+			if (response.IsSuccessStatusCode)
+			{
+				string responseBody = await response.Content.ReadAsStringAsync();
+				CreateUserResponse? createdUser = JsonSerializer.Deserialize<CreateUserResponse>(responseBody, jsonOptions);
+				return createdUser;
+			}
+			else
+			{
+				throw new HttpRequestException($"Failed to create user: {response.ReasonPhrase}");
+			}
 		}
 
 		public async Task<bool> DeleteUser(int id)
@@ -68,16 +79,16 @@ namespace usersManagmentApplication.Server.Services
 			}
 		}
 
-		public async Task<ReqresResponse> GetUsers(int page)
+		public async Task<ReqresResponse> GetUsers(int page ,int perPage)
 		{
-			string url = $"{client.BaseAddress}users?page={page}";
+			string url = $"{client.BaseAddress}users?page={page}&per_page={perPage}";
 			HttpResponseMessage response = await client.GetAsync(url);
 
 			if (response.IsSuccessStatusCode)
 			{
 				string responseBody = await response.Content.ReadAsStringAsync();
 				ReqresResponse users = JsonSerializer.Deserialize<ReqresResponse>(responseBody);
-				return users;
+                return users;
 			}
 			else
 			{
@@ -86,12 +97,32 @@ namespace usersManagmentApplication.Server.Services
 		}
 
 
-		public Task<bool> UpdateUser(int id, string name,string job)
+		public async Task<UpdateUserResponse> UpdateUser(int id, string name,string job)
 		{
-			return Task.FromResult(true)  ;
-			//HttpContent httpContent =new HttpContent().;
-			//HttpResponseMessage response = await client.PutAsync($"{client.BaseAddress}users/{id}",);
+			if (reqresUsers.FirstOrDefault(user => user.Id == id) == null)
+			{
+				throw new InvalidOperationException("User Not Exist cannot update");
+			}
+			var user = new
+			{
+				Name = name,
+				Job = job
+			};
 
-		}
+			var content = new StringContent(JsonSerializer.Serialize(user), Encoding.UTF8, "application/json");
+
+			 HttpResponseMessage response = await client.PutAsync($"{client.BaseAddress}users/{id}",content);
+			if (response.IsSuccessStatusCode)
+			{
+				string responseBody = await response.Content.ReadAsStringAsync();
+				UpdateUserResponse? updateUserResponse = JsonSerializer.Deserialize<UpdateUserResponse>(responseBody, jsonOptions);
+				return updateUserResponse;
+			}
+			else
+			{
+				throw new HttpRequestException($"Failed to create user: {response.ReasonPhrase}");
+			}
+		}	
+
 	}
 }

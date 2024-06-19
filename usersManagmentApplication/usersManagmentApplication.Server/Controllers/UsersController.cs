@@ -1,24 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Xml.Linq;
 using usersManagmentApplication.Server.Dto;
 using usersManagmentApplication.Server.Interfaces;
+using usersManagmentApplication.Server.ReqresResponses;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace usersManagmentApplication.Server.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class UsersController(IQueryService queryService) : ControllerBase
 	{
 
 		// GET: api/<UsersController>
 		[HttpGet("/getUsers/{page}")]
-		public async Task<IActionResult> GetAll (int page)
+		public async Task<IActionResult> GetAll (int page,int perPage)
 		{
 			try
 			{
-				ReqresResponse users = await queryService.GetUsers(page);
+				ReqresResponse users = await queryService.GetUsers(page, perPage);
 				return Ok(users);
 			}
 			catch (HttpRequestException ex)
@@ -54,34 +56,31 @@ namespace usersManagmentApplication.Server.Controllers
 		{
 			try
 			{
-				var result = await queryService.CreateUser(fullName,job);
-				if (result)
-				{
-					return StatusCode(201, "User created successfully");
-				}
-				else
-				{
-					return StatusCode(500, "Failed to create user");
-				}
+				var createdUser = await queryService.CreateUser(fullName, job);
+				return Ok(createdUser);
 			}
-			catch (Exception ex)
+			catch (HttpRequestException ex)
 			{
-				// Log the exception (ex) as needed
-				return StatusCode(500, $"Internal server error: {ex.Message}");
+				return StatusCode(500, new { error = ex.Message });
 			}
 		}
 
 		// PUT api/<UsersController>/5
 		[HttpPut("/updateUser/{id}")]
-		public async Task<IActionResult>Put(int id, [FromBody] string name , string job)
+		public async Task<IActionResult>Put(int id,string fullname , string job)
 		{
-			if (await queryService.UpdateUser(id ,name,job))
+			try
 			{
-				return NoContent();
+				var updatedUser = await queryService.UpdateUser(id, fullname, job);
+				return Ok(updatedUser);
 			}
-			else
+			catch (InvalidOperationException)
 			{
 				return NotFound();
+			}
+			catch (HttpRequestException ex)
+			{
+				return StatusCode(500, new { error = ex.Message });
 			}
 		}
 
